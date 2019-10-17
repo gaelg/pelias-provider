@@ -40,10 +40,11 @@ class Pelias extends AbstractHttpProvider implements Provider
      * @param HttpClient $client  an HTTP adapter
      * @param string     $root    url of Pelias API
      * @param int        $version version of Pelias API
+     * @param bool       $add_version_to_url Whether to add the version number to the API url (some providers do not accept it)
      */
-    public function __construct(HttpClient $client, string $root, int $version = 1)
+    public function __construct(HttpClient $client, string $root, int $version = 1, bool $add_version_to_url = TRUE)
     {
-        $this->root = sprintf('%s/v%d', rtrim($root, '/'), $version);
+        $this->root = $add_version_to_url ? sprintf('%s/v%d', rtrim($root, '/'), $version) : rtrim($root, '/');
         $this->version = $version;
 
         parent::__construct($client);
