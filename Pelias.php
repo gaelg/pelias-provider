@@ -37,15 +37,22 @@ class Pelias extends AbstractHttpProvider implements Provider
     private $version;
 
     /**
+     * @var string
+     */
+    private $apiKey;
+
+    /**
      * @param HttpClient $client  an HTTP adapter
      * @param string     $root    url of Pelias API
      * @param int        $version version of Pelias API
+     * @param string     $api_key API key (some providers require it)
      * @param bool       $add_version_to_url Whether to add the version number to the API url (some providers do not accept it)
      */
-    public function __construct(HttpClient $client, string $root, int $version = 1, bool $add_version_to_url = TRUE)
+    public function __construct(HttpClient $client, string $root, int $version = 1, string $api_key = NULL, bool $add_version_to_url = TRUE)
     {
         $this->root = $add_version_to_url ? sprintf('%s/v%d', rtrim($root, '/'), $version) : rtrim($root, '/');
         $this->version = $version;
+        $this->apiKey = $api_key;
 
         parent::__construct($client);
     }
@@ -85,7 +92,8 @@ class Pelias extends AbstractHttpProvider implements Provider
      */
     public function geocodeQuery(GeocodeQuery $query): Collection
     {
-        return $this->executeQuery($this->getGeocodeQueryUrl($query));
+        $query_data = isset($this->apiKey) ? ['api_key' => $this->apiKey] : [];
+        return $this->executeQuery($this->getGeocodeQueryUrl($query, $query_data));
     }
 
     /**
@@ -116,7 +124,8 @@ class Pelias extends AbstractHttpProvider implements Provider
      */
     public function reverseQuery(ReverseQuery $query): Collection
     {
-        return $this->executeQuery($this->getReverseQueryUrl($query));
+        $query_data = isset($this->apiKey) ? ['api_key' => $this->apiKey] : [];
+        return $this->executeQuery($this->getReverseQueryUrl($query, $query_data));
     }
 
     /**
